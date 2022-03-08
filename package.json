@@ -1,0 +1,19 @@
+{
+  "name": "studybaynode",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bidder.js",
+  "scripts": {
+    "start": "node bidder.js",
+    "build": "nexe -r chromedriver.exe node_modules/selenium-webdriver"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.26.0",
+    "chromedriver": "^96.0.0",
+    "nexe": "^4.0.0-beta.19",
+    "selenium-webdriver": "^4.0.0"
+  }
+}
