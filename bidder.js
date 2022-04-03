@@ -1,9 +1,29 @@
-const {Builder, By, Key, until, WebElement,Capabilities,WebDriver} = require('./node_modules/selenium-webdriver');
+const {Builder, By, Key, until, WebElement,Capabilities,WebDriver} = require('selenium-webdriver');
 require('chromedriver');
 var chrome = require("selenium-webdriver/chrome");
 const axios=require('axios')
 const fs=require('fs')
-const rw=require('./readWrite')
+const rw=require('./readWrite') 
+const encDec=require('./encDec')
+
+//server area
+const express=require('express')
+const app=express()
+const body_parser=require('body-parser')
+app.set('view engine','ejs')
+
+app.use(body_parser.urlencoded({extended:false}))
+
+
+
+app.get('/',(req,res)=>{
+    let raw=fs.readFileSync('settings.json')
+    let data=JSON.parse(raw)
+    res.render('index',{data:data})
+})
+
+var server=app.listen(3000,()=>"server is running");
+//server area end
 
 var options = new chrome.Options();
 // options.addArguments("--headless");
@@ -11,9 +31,53 @@ var options = new chrome.Options();
 options.addArguments("--disable-logging");
 options.addArguments("--log-level=3");
 
+
+let contentJSON=[];
+
+async function settings(){
+    return new Promise((resolve,reject)=>{
+        let raw=fs.readFileSync('settings.json')
+        let data=JSON.parse(raw)
+
+       let driver = new Builder()
+            .forBrowser('chrome')
+            .setChromeOptions(options)
+            .build();
+            // if(data.botID){
+                driver.get("http://localhost:3000");
+
+                app.post('/',(req,res)=>{
+                    
+                    data.email=req.body.email
+                    data.password=req.body.password
+                    data.unwantedSubjects=req.body.unwantedSubjects.trim().split(",")
+                    data.priceLevel=req.body.priceLevel
+                    data.refreshRate=req.body.refreshRate
+                    if(req.body.bidUrgent==="on"){
+                        data.bidUrgent=true
+                    }else{
+                        data.bidUrgent=false
+                    }
+
+                    fs.writeFileSync('settings.json', JSON.stringify(data))
+                    res.end()
+                    driver.quit()  
+                    resolve(data)
+                      
+                    
+                }) 
+
+      
+             
+           
+        
+    })
+}
+
+
 function validateSub(botID){
     return new Promise((resolve,reject)=>{
-        axios.get(`http://192.168.100.48:3000/sb/${botID}`).then((result) => {
+        axios.get(`https://turbo.clink.co.ke/sb/${botID}`).then((result) => {
             resolve(result);
         }).catch((err) => {
             reject(err)
@@ -22,41 +86,42 @@ function validateSub(botID){
 
 }
 
-    async function runBot (email,password) {
-        let cookieExists=false;
+    async function runBot (botData) {
+        console.log(JSON.stringify(botData))
+        const unwantedSubjects=new Set(botData.unwantedSubjects)
         let driver = new Builder()
             .forBrowser('chrome')
             .setChromeOptions(options)
             .build();
 
+
+        //create and login to a server
+        
+
+
             // Navigate to Url
             await driver.get('https://studybay.app');
-
-            if (fs.existsSync('cookie.json')) {
-                let content = fs.readFileSync('cookie.json')
-
-                if(content.length>=1){
-                    let contentJSON=await JSON.parse(content)
-                    for(var i=0;i<contentJSON.length;i++){
-                        await driver.manage().addCookie(contentJSON[i])
-                     }
-                     cookieExists=true;
-                }
-                
+            console.log(`THERE ARE COOKIES${contentJSON.length}`)
+            if(contentJSON.length>=1){
+                console.log(`THERE ARE COOKIES${contentJSON.length}`)
+                for(var i=0;i<contentJSON.length;i++){
+                    await driver.manage().addCookie(contentJSON[i])
+                 }
             }
+         
 
-            if (!cookieExists) {
+            if (contentJSON.length<=0) {
                 try{
                 // Enter text "cheese" and perform keyboard action "Enter"
-                await driver.wait(until.elementLocated(By.name('email')), 10000).sendKeys(email);
+                await driver.wait(until.elementLocated(By.name('email')), 10000).sendKeys(botData.email);
 
-                await driver.wait(until.elementLocated(By.name('password')), 10000).sendKeys(password);
+                await driver.wait(until.elementLocated(By.name('password')), 10000).sendKeys(botData.password);
 
                 await driver.wait(until.elementLocated(By.xpath('//button')), 5000).click();
 
-                await driver.wait(until.titleIs('Studybay'), 5000);
+                await driver.wait(until.titleIs('Studybay'), 10000);
                 }catch(err){
-                    console.log('err 100'+err)
+                    console.log('ERROR LOGIN IN..TRY AGAIN'+err)
                 }
             }
             
@@ -64,18 +129,12 @@ function validateSub(botID){
             await driver.get("https://studybay.app/order/search");
 
             //save cookies if there  is none 
-            if (!cookieExists) {
+            if (contentJSON.length<=0) {
                 driver.manage().getCookies().then(function (cookies) {
-
-                    var cookiesJson = JSON.stringify(cookies, null, 4);
-                    console.log(cookiesJson);
-
-                    fs.writeFile('cookie.json', cookiesJson.toString(), (err) => {
-                        if (err) {
-                            console.log('cookie not saved')
-                        }
-                        console.log('cookie saved ')
-                    })
+                    contentJSON=cookies
+                    console.log('COOKIE saved')
+                    
+                    
                 });
             }
 
@@ -85,43 +144,29 @@ function validateSub(botID){
             while (1 > 0) {
 
                 //
-                console.log('REFRESHES: ',refreshs)
-                if(refreshs>1){
-                    await driver.get('chrome://settings/clearBrowserData');
+                
+                if(refreshs>=100){
+                    console.log('CLEARING MEMORY,PLEASE WAIT...: ',refreshs)
+                    await driver.close();
+                     driver =  new Builder()
+                        .forBrowser('chrome')
+                        .setChromeOptions(options)
+                        .build();
+                    await driver.get("https://studybay.app/order/search");
+                    console.log(`BROWSER OPENED,ADDING COOKIES....`)
 
-                    try{
+                    for(var i=0;i<contentJSON.length;i++){
+                        await driver.manage().addCookie(contentJSON[i])
+                     }
 
-                        await driver.get('chrome://settings/clearBrowserData');
-                        try{
-                        setInterval(()=>{
-                            // let selector = "return document.querySelector(`settings-ui`).shadowRoot.querySelector(`settings-main`).shadowRoot.querySelector(`settings-basic-page`).shadowRoot.querySelector(`settings-section > setting-privacy-page`).shadowRoot.querySelector(`settings-clear-browsing-data-dialog`).shadowRoot.querySelector(`#clearBrowsingDataDialog`).querySelector(`#clearBrowsingDataConfirm`).click()"
-                            
-                            driver.executeScript("document.querySelector(`settings-ui`).shadowRoot.querySelector(`settings-main`).shadowRoot.querySelector(`settings-basic-page`).shadowRoot.querySelector(`settings-section > setting-privacy-page`).shadowRoot.querySelector(`settings-clear-browsing-data-dialog`).shadowRoot.querySelector(`#clearBrowsingDataDialog`).querySelector(`#clearBrowsingDataConfirm`).click()")
-                            
-                        },5000)
-                        }catch(err){console.log(`weeeee`,err)}
-                        
-                    // let root=await driver.findElement(By.tagName("settings-clear-browsing-data-dialog"))
-                    // let shadowDom1=await driver.executeScript("return arguments[0].shadowRoot", root);
-                    // let crDialog=shadowDom1.findElement(By.tagName("cr-dialog"))    
-                    // let buttonContainer=crDialog.findElement(By.xpath("//div[@slot='button-container']"))
-                    // buttonContainer.findElement(By.css('cr-button#clearBrowsingDataConfirm')).click()
-                    }catch(err){
-                        console.log(`ERROR CLEARING.....`,err)
-                    }
-                    
-
-                    setTimeout(()=>{
-                         driver.get('https://studybay.app/order/search')
-                    },5000)
-
-                    refreshs=0
-                    
+                     await driver.get("https://studybay.app/order/search");
+                     console.log(`BIDDING....`)
+                     refreshs=0;
 
                 }
 
                 try {
-                    orders = await driver.wait(until.elementsLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div")), 3000);
+                    orders = await driver.wait(until.elementsLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div")), parseInt(botData.refreshRate)*1000);
                     refreshs++;
                     // console.log(`ORDERS NI  ${orders.getAttribute("class")}`);
                 } catch (err) {
@@ -133,26 +178,54 @@ function validateSub(botID){
 
                 }
 
-                console.log(`AVAILABLE ORDERS ${orders.length}`);
+                console.log(` orders[ ${orders.length}]`);
 
 
 
                 for (var order in orders) {
-                    try {
-                        var oda = await driver.findElement(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div")).getAttribute('innerHTML');
-                        process.stdout.write("*");
-                    } catch (err) {
-                        console.error('err 102' + err);
-                    }
-
+                    
                     //the more button
-                    try {
+                    try
+                     {
                         await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div//button[@class='ExpandButton__Expand-sc-1abt4gw-0 lcvquB']")), 3000).click();
                     } catch (err) {
                         console.error('err 103' + err);
                         break;
                     }
 
+                    //subject filter
+                    if(unwantedSubjects.size>0){
+                        try{
+                            let subjectPlusCat= await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__category orderA-converted__category--offered' or @class= 'orderA-converted__category']")), 4000).getText();
+                            let subject=subjectPlusCat.split(",")[1];
+                            if(unwantedSubjects.has(subject.trim())){
+                                console.log(`${subject} is unwanted`)
+                                await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div//button[@class='styled__Wrapper-sc-pq4ir6-0 fKXtHI']")), 4000).click()
+                                break;
+                            }
+                         }catch(err){
+                             console.error('err 103-B' + err);
+                             break;
+                         }
+                    
+                        }  
+                    //urgent order filter
+                    // try{
+                    //     if (botData.bidUrgent) {
+                    //         let urgentArea=await driver.wait(until.elementLocated(By.xpath("//div[@class='base__DeadlineRoot-sc-i0cmwy-0 bWvlUZ']")),500).getAttribute('innerHTML')
+                    //         // order.getAttribute('innerHTML').includes()
+                    //         if (urgentArea.includes('base__DeadlineEmojiRoot-sc-i0cmwy-2 hWFPQH')) {
+                    //             console.log('Urgent order GETTING RID OF IT')
+                    //             //close order and refresh
+                    //             await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div//button[@class='styled__Wrapper-sc-pq4ir6-0 fKXtHI']")), 4000).click()
+                    //             break;
+
+                    //         }
+                    //     }   
+                    // }catch(err){
+                    //     console.error('103-B' + err);
+                        
+                    // }
                     //start bidding
                     try {
                         await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div//div[@class='styled__MakeBidWrapper-sc-1uth75u-6 bMIqwS']/button")), 3000).click();
@@ -190,6 +263,32 @@ function validateSub(botID){
                         console.error('err 107' + err);
                         continue;
                     }
+
+                    //enter price
+                    if(botData.priceLevel.toLowerCase() !=="none" || botData.priceLevel.length>1){
+                        try {
+                            let inputField=await driver.wait(until.elementLocated(By.xpath("(//input[@type='text'])[last()]")), 3000);
+                            switch (botData.priceLevel.toLowerCase()) {
+                                case "minimum":
+                                    inputField.sendKeys(await driver.findElement(By.xpath("//span[@color='#f6be4e']")).getText())
+                                    break;
+                                case "average ":
+                                    inputField.sendKeys(await driver.findElement(By.xpath("//span[@color='#98bb71']")).getText())
+                                    break;    
+                                
+                                case "maximum":
+                                    inputField.sendKeys(await driver.findElement(By.xpath("//span[@color='#e95454']")).getText())
+                                    break;  
+
+                                default:
+                                    break;
+                            }
+                        } catch (err) {
+                            console.error('err 108' + err);
+                            continue;
+                        }
+                    }
+
                     //finish bid
                     try {
                         await driver.wait(until.elementLocated(By.xpath("(//button[@class='styled__StyledButton-sc-5xmk3z-0 fcfDbB'])[last()]")), 3000).click();
@@ -220,19 +319,34 @@ function validateSub(botID){
         
 };
   
-rw.getBotId().then((botID)=>{
-    //after registering bot or getting botId
-    console.log('BOT ID: ',botID)
-    validateSub(botID)
-        .then((result) => {
-            if (!result.data[0].active) {
-                console.log('subscription expired');
-            } else {
-                // console.log('subscription is ACTIVE ,exp on: ', result.data[0].end);
-                runBot("studybaywriter14@gmail.com", "deno2019")
-            }
-        })
+settings().then((currentSettings)=>{
+    server.close()
+    rw.getBotData().then((botData)=>{
+        //after registering bot or getting botId
+        console.log('BOT ID...: ',botData.botID)
+        validateSub( currentSettings.botID ||botData.botID)
+            .then((result) => {
+                if (!result.data[0].active) {
+                    console.log('subscription expired');
+                } else if(result.data[0].active) {
+                    console.log('subscription is ACTIVE ,exp on: ', result.data[0].end);
+    
+                    //validate one subscription one user
+                    if(encDec.enc(currentSettings.email)===result.data[0].user || result.data[0].user==null){
+                        // f(result.data[0].user==null){
+                        //     //update user field in db
+                        // }
+                        runBot(currentSettings)
+                    }else{
+                        console.log('subscription belongs to another user/wrong email,contact admin for help')
+                    }
+                    
+                }
+            })
+    })
 })
+
+
 
 
 

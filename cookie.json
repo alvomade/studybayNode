@@ -1,7 +1,16 @@
 [
     {
         "domain": "studybay.app",
-        "expiry": 1648928778,
+        "httpOnly": false,
+        "name": "TawkConnectionTime",
+        "path": "/",
+        "sameSite": "Lax",
+        "secure": false,
+        "value": "1647446820970"
+    },
+    {
+        "domain": "studybay.app",
+        "expiry": 1650038813,
         "httpOnly": false,
         "name": "intercomCleared",
         "path": "/",
@@ -10,34 +19,34 @@
     },
     {
         "domain": "studybay.app",
-        "expiry": 1961696778,
+        "expiry": 1962806813,
         "httpOnly": false,
         "name": "browser_uniq",
         "path": "/",
         "secure": false,
-        "value": "788b6a5cb750ced1d686a5b47b2d2442"
+        "value": "5c19f3abab98a5625ac3eea05b5c8232"
     },
     {
         "domain": ".studybay.app",
-        "expiry": 1677872773,
+        "expiry": 1678982810,
         "httpOnly": false,
         "name": "_clck",
         "path": "/",
         "secure": false,
-        "value": "p1vwy3|1|ezg|0"
+        "value": "1pwyxn9|1|ezt|0"
     },
     {
         "domain": ".studybay.app",
-        "expiry": 1709408778,
+        "expiry": 1710518815,
         "httpOnly": false,
         "name": "_ga_2YH535DD4T",
         "path": "/",
         "secure": false,
-        "value": "GS1.1.1646336771.1.0.1646336778.53"
+        "value": "GS1.1.1647446809.1.0.1647446815.54"
     },
     {
         "domain": "studybay.app",
-        "expiry": 1649015172,
+        "expiry": 1650125210,
         "httpOnly": false,
         "name": "adminSwitch",
         "path": "/",
@@ -54,26 +63,26 @@
     },
     {
         "domain": ".studybay.app",
-        "expiry": 1709408772,
+        "expiry": 1710518810,
         "httpOnly": false,
         "name": "_ga",
         "path": "/",
         "secure": false,
-        "value": "GA1.1.1107026612.1646336772"
+        "value": "GA1.1.1629245752.1647446810"
     },
     {
         "domain": ".studybay.app",
-        "expiry": 1654112780,
+        "expiry": 1655222820,
         "httpOnly": false,
         "name": "_fbp",
         "path": "/",
         "sameSite": "Lax",
         "secure": false,
-        "value": "fb.1.1646336772234.1532457528"
+        "value": "fb.1.1647446809926.1135061770"
     },
     {
         "domain": "studybay.app",
-        "expiry": 1961696778,
+        "expiry": 1962806819,
         "httpOnly": false,
         "name": "intercomUserLoggedIn",
         "path": "/",
@@ -82,25 +91,34 @@
     },
     {
         "domain": ".studybay.app",
-        "expiry": 1654112771,
+        "expiry": 1655222809,
         "httpOnly": false,
         "name": "_gcl_au",
         "path": "/",
         "secure": false,
-        "value": "1.1.1551888924.1646336772"
+        "value": "1.1.522406168.1647446810"
     },
     {
         "domain": ".studybay.app",
-        "expiry": 1646423174,
+        "expiry": 1647533211,
         "httpOnly": false,
         "name": "_clsk",
         "path": "/",
         "secure": false,
-        "value": "zdxnb0|1646336774284|1|1|a.clarity.ms/collect"
+        "value": "1y4you7|1647446811451|1|1|b.clarity.ms/collect"
+    },
+    {
+        "domain": "studybay.app",
+        "httpOnly": false,
+        "name": "twk_idm_key",
+        "path": "/",
+        "sameSite": "Lax",
+        "secure": false,
+        "value": "3Vn08kLcWQ0DLfRQTcmV4"
     },
     {
         "domain": ".studybay.app",
-        "expiry": 1646336832,
+        "expiry": 1647446869,
         "httpOnly": false,
         "name": "_gat_UA-150836064-2",
         "path": "/",
@@ -113,24 +131,24 @@
         "name": "io",
         "path": "/",
         "secure": false,
-        "value": "O5pEhD0z9d2KRwKsJkYp"
+        "value": "MxjimcjDqnnreVOHu3ol"
     },
     {
         "domain": ".studybay.app",
-        "expiry": 1646423169,
+        "expiry": 1647533207,
         "httpOnly": false,
         "name": "PHPSESSID",
         "path": "/",
         "secure": false,
-        "value": "babb0122769b7dbca79ac021ecb8de91"
+        "value": "93b9141c195e1b517a04c770cc729b27"
     },
     {
         "domain": ".studybay.app",
-        "expiry": 1646423172,
+        "expiry": 1647533209,
         "httpOnly": false,
         "name": "_gid",
         "path": "/",
         "secure": false,
-        "value": "GA1.2.939584435.1646336772"
+        "value": "GA1.2.407564611.1647446810"
     }
 ]
