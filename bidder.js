@@ -121,7 +121,7 @@ function validateSub(botID){
 
                 await driver.wait(until.titleIs('Studybay'), 10000);
                 }catch(err){
-                    console.log('ERROR LOGIN IN..TRY AGAIN'+err)
+                    console.log('ERROR LOGIN IN..TRY AGAIN')
                 }
             }
             
