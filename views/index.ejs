@@ -99,9 +99,10 @@ input{background-color: black;}
     <div class="cotainer">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="card" style="background-color: black;">
+                <div class="card" style="background-color: #6a6a6a;">
+                    <div class="card-header" style="background-color: #444444;">Turbo studybay bot v2.0</div>
                   <%if(data.botID){%> 
-                    <div class="card-header">Bot ID: <%=data.botID%></div>
+                    <div class="card-header" style="background-color: #515151;">Bot ID: <%=data.botID%></div>
                     <%}else{%>
                         <div class="card-header">fill in the account details to proceed</div>
                     <%}%>    
@@ -120,9 +121,9 @@ input{background-color: black;}
                                     <input value="<%=data.password%>" type="text" id="password" class="form-control" name="password" required>
                                 </div>
                             </div>
-
+                            <hr style="border: 1px double #444444;">
                             <div class="form-group row">
-                              <label for="password" class="col-md-4 col-form-label text-md-right">refresh rate</label>
+                              <label for="password" class="col-md-4 col-form-label text-md-right">refresh rate(seconds)</label>
                               <div class="col-md-6">
                                   <input value="<%=data.refreshRate%>" type="number" id="password" class="form-control" name="refreshRate" required>
                               </div>
@@ -150,15 +151,15 @@ input{background-color: black;}
                               </div>
                             </div>
 
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                               <label for="password" class="col-md-4 col-form-label text-md-right"></label>
                               <div class="col-md-6">
                                 <input checked type="checkbox" name="bidUrgent"> Bid urgent orders
                               </div>
-                          </div>
+                          </div> -->
 
                             <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-warning text-black">
                                     Save and continue
                                 </button>
                                 <!-- <a href="#" class="btn btn-link">
