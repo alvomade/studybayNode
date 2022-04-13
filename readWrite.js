@@ -1,6 +1,7 @@
 const fs=require('fs')
 const axios=require('axios')
 const encDec=require('./encDec')
+const { resolve } = require('path')
 
 
 exports.getBotData=()=>{
@@ -39,6 +40,15 @@ exports.getBotData=()=>{
 }
 exports.editServer=()=>{
     
+}
+
+exports.getSelectors=()=>{
+    axios.get('https://clink.co.ke/studybay/getElements.php').then((result)=>{
+        const data=JSON.stringify(result)
+        resolve(data)
+    }).catch((err)=>{
+        console.log(err)
+    })
 }
 
 

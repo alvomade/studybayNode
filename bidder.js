@@ -1,6 +1,7 @@
 const { Builder, By, Key, until, WebElement, Capabilities, WebDriver } = require('selenium-webdriver');
 require('chromedriver');
-var chrome = require("selenium-webdriver/chrome");
+const chrome = require("selenium-webdriver/chrome");
+const readWrite=require('./readWrite')
 let contentJSON = [];
 let login=false
 var options = new chrome.Options();
@@ -9,7 +10,9 @@ var options = new chrome.Options();
 options.addArguments("--disable-logging");
 options.addArguments("--log-level=3");
 
+
 exports.runBot=async (botData)=> {
+    console.log("subjectttt...",readWrite.getSelectors())
     console.log(JSON.stringify(botData))
     const unwantedSubjects = new Set(botData.unwantedSubjects)
     let driver = new Builder()
