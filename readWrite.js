@@ -42,13 +42,18 @@ exports.editServer=()=>{
     
 }
 
-exports.getSelectors=()=>{
-    axios.get('https://clink.co.ke/studybay/getElements.php').then((result)=>{
-        const data=JSON.stringify(result)
+exports.getSelectors=()=>{ 
+    return new Promise((resolve,reject)=>{
+        axios.get('https://turbo.clink.co.ke/sb_selectors').then((result)=>{
+        // console.log(result.data)
+        let data=result.data
+        data=data.map(a => a.locator)
         resolve(data)
     }).catch((err)=>{
         console.log(err)
     })
+    })
+    
 }
 
 

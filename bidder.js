@@ -12,7 +12,23 @@ options.addArguments("--log-level=3");
 
 
 exports.runBot=async (botData)=> {
-    console.log("subjectttt...",readWrite.getSelectors())
+    // var selectors=[];
+    
+    // readWrite.getSelectors().then((data)=>{
+
+    //     // for(var sel in data){
+    //     //     var arrayValue=data[sel]
+    //     //     // selectors[sel.name]=sel.locator
+            
+    //     //     selectors[`${arrayValue.name}`]=arrayValue.locator
+            
+    //     // }
+    //     // selectors=data.map(a => a.locator)
+    //     selectors=data;
+    //     console.log(data)
+
+    // }).catch(err=>console.log(err))
+    // console.log("subjectttt...",selectors)
     console.log(JSON.stringify(botData))
     const unwantedSubjects = new Set(botData.unwantedSubjects)
     let driver = new Builder()
@@ -91,7 +107,7 @@ exports.runBot=async (botData)=> {
         }
 
         try {
-            orders = await driver.wait(until.elementsLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div")), parseInt(botData.refreshRate) * 1000);
+            orders = await driver.wait(until.elementsLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium' or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--paid orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 Ekvmc']]/div")), parseInt(botData.refreshRate) * 1000);
             refreshs++;
             // console.log(`ORDERS NI  ${orders.getAttribute("class")}`);
         } catch (err) {
@@ -111,7 +127,7 @@ exports.runBot=async (botData)=> {
 
             //the more button
             try {
-                await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div//button[@class='ExpandButton__Expand-sc-1abt4gw-0 lcvquB']")), 3000).click();
+                await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium' or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--paid orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 Ekvmc']]/div//button[@class='ExpandButton__Expand-sc-1abt4gw-0 iIDguA']")), 3000).click();
             } catch (err) {
                 console.error('err 103' + err);
                 break;
@@ -120,11 +136,11 @@ exports.runBot=async (botData)=> {
             //subject filter
             if (unwantedSubjects.size > 0) {
                 try {
-                    let subjectPlusCat = await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__category orderA-converted__category--offered' or @class= 'orderA-converted__category']")), 4000).getText();
+                    let subjectPlusCat = await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__category' or @class='orderA-converted__category orderA-converted__category--offered']")), 4000).getText();
                     let subject = subjectPlusCat.split(",")[1];
                     if (unwantedSubjects.has(subject.trim())) {
                         console.log(`${subject} is unwanted`)
-                        await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div//button[@class='styled__Wrapper-sc-pq4ir6-0 fKXtHI']")), 4000).click()
+                        await driver.wait(until.elementLocated(By.xpath("//button[@class='styled__Wrapper-sc-pq4ir6-0 bShWWg']")), 4000).click()
                         break;
                     }
                 } catch (err) {
@@ -152,35 +168,35 @@ exports.runBot=async (botData)=> {
             // }
             //start bidding
             try {
-                await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div//div[@class='styled__MakeBidWrapper-sc-1uth75u-6 bMIqwS']/button")), 3000).click();
+                await driver.wait(until.elementLocated(By.xpath("//button[@class='styled__StyledButton-sc-5xmk3z-0 kMHpa styled__MakeBidButton-sc-1uth75u-9 JkCDS' or @class='styled__StyledButton-sc-5xmk3z-0 ggIyto styled__MakeBidButton-sc-1uth75u-9 JkCDS']")), 3000).click();
             } catch (err) {
                 console.error('err 104' + err);
-                continue;
+                break;
             }
 
            
 
             //message dropdown
             try {
-                let messageDropdown = await driver.wait(until.elementLocated(By.xpath("(//div[@class='styled__Field-sc-tkvsdl-1 levjpM']/div)[last()]")), 3000);
+                let messageDropdown = await driver.wait(until.elementLocated(By.xpath("//div[@class='styled__Field-sc-tkvsdl-1 dIpAlL']")), 3000);
                 await driver.executeScript("arguments[0].click();", messageDropdown);
             } catch (err) {
                 console.error('err 106' + err);
-                continue;
+                break;
             }
 
             //message select
             try {
-                await driver.wait(until.elementLocated(By.xpath("(//div[@placeholder='Choose a template']/following-sibling::div/div)[last()]")), 3000).click();
+                await driver.wait(until.elementLocated(By.xpath("//div[@class='styled__OptionList-sc-tkvsdl-4 busdaf']")), 3000).click();
             } catch (err) {
                 console.error('err 107' + err);
-                continue;
+                break;
             }
 
             //enter price
             if (botData.priceLevel.toLowerCase() !== "none" || botData.priceLevel.length > 1) {
                 try {
-                    let inputField = await driver.wait(until.elementLocated(By.xpath("(//input[@type='text'])[last()]")), 3000);
+                    let inputField = await driver.wait(until.elementLocated(By.xpath("(//div[@class='sb-makeOffer-converted__input']//input)[last()]")), 3000);
                     switch (botData.priceLevel.toLowerCase()) {
                         case "minimum":
                             inputField.sendKeys(await driver.findElement(By.xpath("//span[@color='#f6be4e']")).getText())
@@ -198,17 +214,17 @@ exports.runBot=async (botData)=> {
                     }
                 } catch (err) {
                     console.error('err 108' + err);
-                    continue;
+                    break;
                 }
             }
 
             //finish bid
             try {
-                await driver.wait(until.elementLocated(By.xpath("(//button[@class='styled__StyledButton-sc-5xmk3z-0 fcfDbB'])[last()]")), 3000).click();
+                await driver.wait(until.elementLocated(By.xpath("(//button[@class='styled__StyledButton-sc-5xmk3z-0 kMHpa'])[last()]")), 3000).click();
                 process.stdout.write("*");
             } catch (err) {
                 console.error('err 108' + err);
-                continue;
+                break;
             }
 
             //close modal    
@@ -218,7 +234,7 @@ exports.runBot=async (botData)=> {
                 process.stdout.write("x");
             } catch (err) {
                 console.error('err 109' + err);
-                continue;
+                break;
             }
 
 
