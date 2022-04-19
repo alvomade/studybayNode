@@ -10,6 +10,7 @@ var options = new chrome.Options();
 options.addArguments("--disable-logging");
 options.addArguments("--log-level=3");
 
+var map = require('selenium-webdriver').promise.map;
 
 exports.runBot=async (botData)=> {
     // var selectors=[];
@@ -79,7 +80,7 @@ exports.runBot=async (botData)=> {
         });
     }
 
-    var orders = '';
+    let orders = null;
     let refreshs = 0
 
     while (1 > 0) {
@@ -121,13 +122,17 @@ exports.runBot=async (botData)=> {
 
         console.log(` orders[ ${orders.length}]`);
 
+        // map(orders, e => e.findElement(By.xpath(".//a[@class='orderA-converted__name' or @class='orderA-converted__name orderA-converted__name--read']")).getText())
+        //     .then(function (values) {
+        //         console.log(values);
+        //     });
+        //     continue;
+        for (let order of orders) {
 
-
-        for (var order in orders) {
-
+             
             //the more button
             try {
-                await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium' or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--paid orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 Ekvmc']]/div//button[@class='ExpandButton__Expand-sc-1abt4gw-0 iIDguA']")), 3000).click();
+                await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(".//button[@class='ExpandButton__Expand-sc-1abt4gw-0 iIDguA']"))), 3000).click();
             } catch (err) {
                 console.error('err 103' + err);
                 break;
@@ -136,11 +141,11 @@ exports.runBot=async (botData)=> {
             //subject filter
             if (unwantedSubjects.size > 0) {
                 try {
-                    let subjectPlusCat = await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__category' or @class='orderA-converted__category orderA-converted__category--offered']")), 4000).getText();
+                    let subjectPlusCat = await driver.wait(until.elementIsVisible(await order.findElement(By.xpath("//div[@class='orderA-converted__category' or @class='orderA-converted__category orderA-converted__category--offered']"))), 4000).getText();
                     let subject = subjectPlusCat.split(",")[1];
                     if (unwantedSubjects.has(subject.trim())) {
                         console.log(`${subject} is unwanted`)
-                        await driver.wait(until.elementLocated(By.xpath("//button[@class='styled__Wrapper-sc-pq4ir6-0 bShWWg']")), 4000).click()
+                        await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(".//button[@class='styled__Wrapper-sc-pq4ir6-0 bShWWg']"))), 4000).click()
                         break;
                     }
                 } catch (err) {
@@ -168,7 +173,7 @@ exports.runBot=async (botData)=> {
             // }
             //start bidding
             try {
-                await driver.wait(until.elementLocated(By.xpath("//button[@class='styled__StyledButton-sc-5xmk3z-0 kMHpa styled__MakeBidButton-sc-1uth75u-9 JkCDS' or @class='styled__StyledButton-sc-5xmk3z-0 ggIyto styled__MakeBidButton-sc-1uth75u-9 JkCDS']")), 3000).click();
+                await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(".//button[@class='styled__StyledButton-sc-5xmk3z-0 kMHpa styled__MakeBidButton-sc-1uth75u-9 JkCDS' or @class='styled__StyledButton-sc-5xmk3z-0 ggIyto styled__MakeBidButton-sc-1uth75u-9 JkCDS']"))), 3000).click();
             } catch (err) {
                 console.error('err 104' + err);
                 break;
@@ -236,8 +241,6 @@ exports.runBot=async (botData)=> {
                 console.error('err 109' + err);
                 break;
             }
-
-
         }
 
         await driver.navigate().refresh();

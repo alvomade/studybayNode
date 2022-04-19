@@ -20,7 +20,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 
-    <title>Laravel</title>
+    <title>Turbo studybay bot v2.1 by clink</title>
     <style>
       @import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);
 
@@ -100,7 +100,7 @@ input{background-color: black;}
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card" style="background-color: #6a6a6a;">
-                    <div class="card-header" style="background-color: #444444;">Turbo studybay bot v2.0</div>
+                    <div class="card-header" style="background-color: #444444;">Turbo studybay bot v2.1</div>
                   <%if(data.botID){%> 
                     <div class="card-header" style="background-color: #515151;">Bot ID: <%=data.botID%></div>
                     <%}else{%>
@@ -143,7 +143,7 @@ input{background-color: black;}
                           </div>
 
                             <div class="form-group row">
-                              <label for="password" class="col-md-4 col-form-label text-md-right">unwanted subjects</label>
+                              <label for="password" class="col-md-4 col-form-label text-md-right">unwanted subjects<br><small style="color: black;">(NB:separate subject names with a comma)</small></label>
                               <div class="col-md-6">
                                 <textarea name="unwantedSubjects" id="" cols="30" rows="10">
                                   <%=data.unwantedSubjects%>
