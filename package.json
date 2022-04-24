@@ -4,7 +4,8 @@
   "description": "",
   "main": "launcher.js",
   "scripts": {
-    "start": "node launcher.js"
+    "start":"node launcher.js",
+    "pacit": "nexe -i \"launcher.js\" -r \"node_modules/**/*\" -r \"views\"  -o \"dist/launcher.exe\" -t x64-14.15.3"
   },
   "keywords": [],
   "author": "",
