@@ -13,23 +13,13 @@ options.addArguments("--log-level=3");
 var map = require('selenium-webdriver').promise.map;
 
 exports.runBot=async (botData)=> {
-    // var selectors=[];
-    
-    // readWrite.getSelectors().then((data)=>{
+    var locators={};
+    //getting the locators
+    readWrite.getLocators().then((data)=>{
+        locators=data
 
-    //     // for(var sel in data){
-    //     //     var arrayValue=data[sel]
-    //     //     // selectors[sel.name]=sel.locator
-            
-    //     //     selectors[`${arrayValue.name}`]=arrayValue.locator
-            
-    //     // }
-    //     // selectors=data.map(a => a.locator)
-    //     selectors=data;
-    //     console.log(data)
+    }).catch(err=>console.log(err))
 
-    // }).catch(err=>console.log(err))
-    // console.log("subjectttt...",selectors)
     console.log(JSON.stringify(botData))
     const unwantedSubjects = new Set(botData.unwantedSubjects)
     let driver = new Builder()
@@ -108,7 +98,10 @@ exports.runBot=async (botData)=> {
         }
 
         try {
-            orders = await driver.wait(until.elementsLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium' or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--paid orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 Ekvmc']]/div")), parseInt(botData.refreshRate) * 1000);
+            orders = await driver.wait(until.elementsLocated(By.xpath(locators.urgentOrders)), parseInt(botData.refreshRate) * 1000);
+            // orders = await driver.wait(until.elementsLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--read orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--premium' or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--paid orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 Ekvmc']]/div")), parseInt(botData.refreshRate) * 1000);
+
+            //div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--read orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--premium' or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--paid orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 Ekvmc']]/div
             refreshs++;
             // console.log(`ORDERS NI  ${orders.getAttribute("class")}`);
         } catch (err) {
@@ -132,7 +125,7 @@ exports.runBot=async (botData)=> {
              
             //the more button
             try {
-                await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(".//button[@class='ExpandButton__Expand-sc-1abt4gw-0 iIDguA']"))), 3000).click();
+                await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(locators.more))), 3000).click();
             } catch (err) {
                 console.error('err 103' + err);
                 break;
@@ -141,11 +134,11 @@ exports.runBot=async (botData)=> {
             //subject filter
             if (unwantedSubjects.size > 0) {
                 try {
-                    let subjectPlusCat = await driver.wait(until.elementIsVisible(await order.findElement(By.xpath("//div[@class='orderA-converted__category' or @class='orderA-converted__category orderA-converted__category--offered']"))), 4000).getText();
+                    let subjectPlusCat = await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(locators.subject))), 4000).getText();
                     let subject = subjectPlusCat.split(",")[1];
                     if (unwantedSubjects.has(subject.trim())) {
                         console.log(`${subject} is unwanted`)
-                        await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(".//button[@class='styled__Wrapper-sc-pq4ir6-0 bShWWg']"))), 4000).click()
+                        await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(locators.close))), 4000).click()
                         break;
                     }
                 } catch (err) {
@@ -155,35 +148,33 @@ exports.runBot=async (botData)=> {
 
             }
             //urgent order filter
-            // try{
-            //     if (botData.bidUrgent) {
-            //         let urgentArea=await driver.wait(until.elementLocated(By.xpath("//div[@class='base__DeadlineRoot-sc-i0cmwy-0 bWvlUZ']")),500).getAttribute('innerHTML')
-            //         // order.getAttribute('innerHTML').includes()
-            //         if (urgentArea.includes('base__DeadlineEmojiRoot-sc-i0cmwy-2 hWFPQH')) {
-            //             console.log('Urgent order GETTING RID OF IT')
-            //             //close order and refresh
-            //             await driver.wait(until.elementLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--premium'or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 mmMJL']]/div//button[@class='styled__Wrapper-sc-pq4ir6-0 fKXtHI']")), 4000).click()
-            //             break;
+            try{
+                if (!botData.bidUrgent) {
+                    let urgentArea=await driver.wait(until.elementIsVisible(order.findElement(By.xpath(".//div[1]"))),500).getAttribute('class')
+                    if (urgentArea.includes('orderA-converted__status--quick')) {
+                        console.log('Urgent order ,,moving on...')
+                        //close order and refresh
+                        await driver.wait(until.elementIsVisible(order.findElement(By.xpath(locators.close))), 4000).click()
+                        break;
 
-            //         }
-            //     }   
-            // }catch(err){
-            //     console.error('103-B' + err);
+                    }
+                }   
+            }catch(err){
+                console.error('103-c' + err);
 
-            // }
+            }
             //start bidding
             try {
-                await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(".//button[@class='styled__StyledButton-sc-5xmk3z-0 kMHpa styled__MakeBidButton-sc-1uth75u-9 JkCDS' or @class='styled__StyledButton-sc-5xmk3z-0 ggIyto styled__MakeBidButton-sc-1uth75u-9 JkCDS']"))), 3000).click();
+                await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(locators.start_bidding))), 3000).click();
             } catch (err) {
                 console.error('err 104' + err);
                 break;
             }
 
-           
 
             //message dropdown
             try {
-                let messageDropdown = await driver.wait(until.elementLocated(By.xpath("//div[@class='styled__Field-sc-tkvsdl-1 dIpAlL']")), 3000);
+                let messageDropdown = await driver.wait(until.elementLocated(By.css(locators.message_dropDown)), 3000);
                 await driver.executeScript("arguments[0].click();", messageDropdown);
             } catch (err) {
                 console.error('err 106' + err);
@@ -192,7 +183,7 @@ exports.runBot=async (botData)=> {
 
             //message select
             try {
-                await driver.wait(until.elementLocated(By.xpath("//div[@class='styled__OptionList-sc-tkvsdl-4 busdaf']")), 3000).click();
+                await driver.wait(until.elementLocated(By.xpath(locators.message_select)), 3000).click();
             } catch (err) {
                 console.error('err 107' + err);
                 break;
@@ -201,7 +192,7 @@ exports.runBot=async (botData)=> {
             //enter price
             if (botData.priceLevel.toLowerCase() !== "none" || botData.priceLevel.length > 1) {
                 try {
-                    let inputField = await driver.wait(until.elementLocated(By.xpath("(//div[@class='sb-makeOffer-converted__input']//input)[last()]")), 3000);
+                    let inputField = await driver.wait(until.elementLocated(By.xpath(locators.price_input)), 3000);
                     switch (botData.priceLevel.toLowerCase()) {
                         case "minimum":
                             inputField.sendKeys(await driver.findElement(By.xpath("//span[@color='#f6be4e']")).getText())
@@ -223,9 +214,9 @@ exports.runBot=async (botData)=> {
                 }
             }
 
-            //finish bid
+            // finish bid
             try {
-                await driver.wait(until.elementLocated(By.xpath("(//button[@class='styled__StyledButton-sc-5xmk3z-0 kMHpa'])[last()]")), 3000).click();
+                await driver.wait(until.elementLocated(By.xpath(locators.start_bidding2)), 3000).click();
                 process.stdout.write("*");
             } catch (err) {
                 console.error('err 108' + err);
@@ -234,7 +225,7 @@ exports.runBot=async (botData)=> {
 
             //close modal    
             try {
-                let closeModal = await driver.wait(until.elementLocated(By.xpath("//button[@class='ui-modal-close']")), 3000);
+                let closeModal = await driver.wait(until.elementLocated(By.xpath(locators.modal_close)), 3000);
                 await driver.executeScript("arguments[0].click();", closeModal);
                 process.stdout.write("x");
             } catch (err) {

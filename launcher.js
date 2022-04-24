@@ -52,11 +52,11 @@ function settings() {
             data.unwantedSubjects = req.body.unwantedSubjects.trim().split(",")
             data.priceLevel = req.body.priceLevel
             data.refreshRate = req.body.refreshRate
-            // if (req.body.bidUrgent === "on") {
-            //     data.bidUrgent = true
-            // } else {
-            //     data.bidUrgent = false
-            // }
+            if (req.body.bidUrgent === "on") {
+                data.bidUrgent = true
+            } else {
+                data.bidUrgent = false
+            }
 
             fs.writeFileSync('settings.json', JSON.stringify(data))
             res.end()
@@ -101,10 +101,16 @@ settings().then((currentSettings) => {
 
                     //validate one subscription one user
                     if (encDec.enc(currentSettings.email) === result.data[0].user || result.data[0].user == null) {
-                        // f(result.data[0].user==null){
-                        //     //update user field in db
-                        // }
-                        bidder.runBot(currentSettings)
+                        if(result.data[0].user==null){
+                            //update user field in db
+                            axios.put(`https://turbo.clink.co.ke/sb/${botData.botID}/${botData.email}`).then((data)=>{
+                                bidder.runBot(currentSettings)
+                            })
+                        }else{
+                            bidder.runBot(currentSettings)
+                        }
+                        
+                        
                     } else {
                         console.log('subscription belongs to another user/wrong email,contact admin for help')
                     }

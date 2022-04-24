@@ -42,13 +42,20 @@ exports.editServer=()=>{
     
 }
 
-exports.getSelectors=()=>{ 
+exports.getLocators=()=>{ 
     return new Promise((resolve,reject)=>{
         axios.get('https://turbo.clink.co.ke/sb_selectors').then((result)=>{
         // console.log(result.data)
         let data=result.data
-        data=data.map(a => a.locator)
-        resolve(data)
+        // data=data.map(a => a.locator,":",a.name)
+        
+        let selectorObj={}
+        for(let i=0;i<data.length;i++){
+            selectorObj[`${data[i].name}`]=data[i].locator
+        }
+        
+        resolve(selectorObj)
+
     }).catch((err)=>{
         console.log(err)
     })
