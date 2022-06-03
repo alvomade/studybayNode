@@ -1,6 +1,7 @@
 const { Builder, By, Key, until, WebElement, Capabilities, WebDriver } = require('selenium-webdriver');
 require('chromedriver');
 const chrome = require("selenium-webdriver/chrome");
+const {Worker}=require('worker_threads')
 const readWrite=require('./readWrite')
 let contentJSON = [];
 let login=false
@@ -10,7 +11,6 @@ var options = new chrome.Options();
 options.addArguments("--disable-logging");
 options.addArguments("--log-level=3");
 
-var map = require('selenium-webdriver').promise.map;
 
 exports.runBot=async (botData)=> {
     var locators={};
@@ -47,10 +47,10 @@ exports.runBot=async (botData)=> {
 
             await driver.wait(until.elementLocated(By.xpath('//button')), 5000).click();
 
-            await driver.wait(until.titleIs('Studybay'), 10000);
+            await driver.wait(until.titleIs('Studybay'), 50000);
             login=true
         } catch (err) {
-            console.log('ERROR LOGIN IN..TRY AGAIN')
+            console.log('ERROR LOGIN IN..TRY AGAIN',err)
             login=false
 
         }
@@ -61,10 +61,29 @@ exports.runBot=async (botData)=> {
 
     //save cookies if there  is none 
     if (contentJSON.length <= 0) {
-        driver.manage().getCookies().then(function (cookies) {
-            contentJSON = cookies
+        driver.manage().getCookies().then(function (cookiez) {
+            contentJSON = cookiez
             if(login){
             console.log('SUCCESSFUL LOGIN....BIDDING...')
+            
+                //check if user wants bot to bid second message
+                if (botData.sendSecondMessage) {
+                    console.log('THREAD IS STARTING')
+                    //spawn new thread
+                    const mfanyikazi = new Worker('./messenger.js', {
+                        workerData: {
+                            cookies: cookiez,
+                            secondMessage:botData.secondMessage
+                        }
+                    })
+                    mfanyikazi.on('message', (data) => {
+                        console.log(data)
+                    })
+                }else{
+                    console.log('THREAD WONTTTTTTTTT')
+                }
+            
+
             } 
 
         });
@@ -107,7 +126,7 @@ exports.runBot=async (botData)=> {
         } catch (err) {
             // console.error('err 101'+err);
             refreshs++;
-            process.stdout.write("-");
+            // process.stdout.write("-");
             await driver.navigate().refresh();
             continue;
 
@@ -125,7 +144,7 @@ exports.runBot=async (botData)=> {
              
             //the more button
             try {
-                await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(locators.more))), 3000).click();
+                await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(locators.more))), 5000).click();
             } catch (err) {
                 console.error('err 103' + err);
                 break;
@@ -165,7 +184,7 @@ exports.runBot=async (botData)=> {
             }
             //start bidding
             try {
-                await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(locators.start_bidding))), 3000).click();
+                await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(locators.start_bidding))), 5000).click();
             } catch (err) {
                 console.error('err 104' + err);
                 break;
@@ -174,7 +193,7 @@ exports.runBot=async (botData)=> {
 
             //message dropdown
             try {
-                let messageDropdown = await driver.wait(until.elementLocated(By.css(locators.message_dropDown)), 3000);
+                let messageDropdown = await driver.wait(until.elementLocated(By.css(locators.message_dropDown)), 10000);
                 await driver.executeScript("arguments[0].click();", messageDropdown);
             } catch (err) {
                 console.error('err 106' + err);
@@ -183,7 +202,8 @@ exports.runBot=async (botData)=> {
 
             //message select
             try {
-                await driver.wait(until.elementLocated(By.xpath(locators.message_select)), 3000).click();
+                let messageSelect=await driver.wait(until.elementLocated(By.xpath(locators.message_select)), 5000)
+                await driver.executeScript("arguments[0].click();", messageSelect);
             } catch (err) {
                 console.error('err 107' + err);
                 break;
@@ -192,12 +212,12 @@ exports.runBot=async (botData)=> {
             //enter price
             if (botData.priceLevel.toLowerCase() !== "none" || botData.priceLevel.length > 1) {
                 try {
-                    let inputField = await driver.wait(until.elementLocated(By.xpath(locators.price_input)), 3000);
+                    let inputField = await driver.wait(until.elementLocated(By.xpath(locators.price_input)), 5000);
                     switch (botData.priceLevel.toLowerCase()) {
                         case "minimum":
                             inputField.sendKeys(await driver.findElement(By.xpath("//span[@color='#f6be4e']")).getText())
                             break;
-                        case "average ":
+                        case "average":
                             inputField.sendKeys(await driver.findElement(By.xpath("//span[@color='#98bb71']")).getText())
                             break;
 
@@ -216,20 +236,20 @@ exports.runBot=async (botData)=> {
 
             // finish bid
             try {
-                await driver.wait(until.elementLocated(By.xpath(locators.start_bidding2)), 3000).click();
+                await driver.wait(until.elementLocated(By.xpath(locators.start_bidding2)), 5000).click();
                 process.stdout.write("*");
             } catch (err) {
-                console.error('err 108' + err);
+                console.error('err 109' + err);
                 break;
             }
 
             //close modal    
             try {
-                let closeModal = await driver.wait(until.elementLocated(By.xpath(locators.modal_close)), 3000);
+                let closeModal = await driver.wait(until.elementLocated(By.xpath(locators.modal_close)), 5000);
                 await driver.executeScript("arguments[0].click();", closeModal);
                 process.stdout.write("x");
             } catch (err) {
-                console.error('err 109' + err);
+                console.error('err 110' + err);
                 break;
             }
         }

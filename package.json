@@ -4,7 +4,7 @@
   "description": "",
   "main": "launcher.js",
   "scripts": {
-    "start":"node launcher.js",
+    "start": "node launcher.js",
     "pacit": "nexe -i \"launcher.js\" -r \"node_modules/**/*\" -r \"views\"  -o \"dist/launcher.exe\" -t x64-14.15.3"
   },
   "keywords": [],
@@ -12,10 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "axios": "0.26.0",
-    "chromedriver": "99.0.0",
+    "chromedriver": "^101.0.0",
     "ejs": "3.1.6",
     "express": "4.17.3",
     "nexe": "4.0.0-beta.19",
-    "selenium-webdriver": "^4.1.1"
+    "selenium-webdriver": "4.1.1"
   }
 }

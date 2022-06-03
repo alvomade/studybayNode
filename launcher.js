@@ -30,9 +30,6 @@ var options = new chrome.Options();
 options.addArguments("--disable-logging");
 options.addArguments("--log-level=3");
 
-
-
-
 function settings() {
     return new Promise((resolve, reject) => {
         let raw = fs.readFileSync('settings.json')
@@ -52,10 +49,17 @@ function settings() {
             data.unwantedSubjects = req.body.unwantedSubjects.trim().split(",")
             data.priceLevel = req.body.priceLevel
             data.refreshRate = req.body.refreshRate
+            data.secondMessage=req.body.secondMessage.trim()
             if (req.body.bidUrgent === "on") {
                 data.bidUrgent = true
             } else {
                 data.bidUrgent = false
+            }
+
+            if (req.body.sendSecondMessage === "on") {
+                data.sendSecondMessage = true
+            } else {
+                data.sendSecondMessage = false
             }
 
             fs.writeFileSync('settings.json', JSON.stringify(data))
@@ -73,7 +77,6 @@ function settings() {
     })
 }
 
-
 function validateSub(botID) {
     return new Promise((resolve, reject) => {
         axios.get(`https://turbo.clink.co.ke/sb/${botID}`).then((result) => {
@@ -84,8 +87,6 @@ function validateSub(botID) {
     })
 
 }
-
-
 
 settings().then((currentSettings) => {
     server.close()
