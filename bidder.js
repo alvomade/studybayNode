@@ -1,7 +1,7 @@
 const { Builder, By, Key, until, WebElement, Capabilities, WebDriver } = require('selenium-webdriver');
 require('chromedriver');
 const chrome = require("selenium-webdriver/chrome");
-const {Worker}=require('worker_threads')
+const {execFile}=require('child_process')
 const readWrite=require('./readWrite')
 let contentJSON = [];
 let login=false
@@ -63,27 +63,17 @@ exports.runBot=async (botData)=> {
     if (contentJSON.length <= 0) {
         driver.manage().getCookies().then(function (cookiez) {
             contentJSON = cookiez
+
+            //SAVE COOKIES TO FILE FOR MESSENGER BOT
+            readWrite.writeCookieFile(cookiez)
+
             if(login){
             console.log('SUCCESSFUL LOGIN....BIDDING...')
-            
-                //check if user wants bot to bid second message
-                if (botData.sendSecondMessage) {
-                    console.log('THREAD IS STARTING')
-                    //spawn new thread
-                    const mfanyikazi = new Worker('./messenger.js', {
-                        workerData: {
-                            cookies: cookiez,
-                            secondMessage:botData.secondMessage
-                        }
+                if(botData.sendSecondMessage){
+                    execFile('./messo.exe',(err)=>{
+                        
                     })
-                    mfanyikazi.on('message', (data) => {
-                        console.log(data)
-                    })
-                }else{
-                    console.log('THREAD WONTTTTTTTTT')
                 }
-            
-
             } 
 
         });

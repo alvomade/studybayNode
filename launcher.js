@@ -10,12 +10,12 @@ const bidder=require('./bidder')
 //server area
 const express = require('express')
 const app = express()
-const body_parser = require('body-parser')
+const body_parser = require('body-parser');
 app.set('view engine', 'ejs')
 
 app.use(body_parser.urlencoded({ extended: false }))
 
-app.get('/', (req, res) => {
+app.get('/', (req, res) => {    
     let raw = fs.readFileSync('settings.json')
     let data = JSON.parse(raw)
     res.render('index', { data: data })
@@ -97,6 +97,7 @@ settings().then((currentSettings) => {
             .then((result) => {
                 if (!result.data[0].active) {
                     console.log('subscription expired');
+                    // sleep.sleep(10)
                 } else if (result.data[0].active) {
                     console.log('subscription is ACTIVE ,exp on: ', result.data[0].end);
 

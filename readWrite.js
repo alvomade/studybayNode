@@ -63,6 +63,10 @@ exports.getLocators=()=>{
     
 }
 
+exports.writeCookieFile=(cookies)=>{
+    fs.writeFileSync('cookies.json',JSON.stringify(cookies))
+}
+
 
 
 
