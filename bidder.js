@@ -108,21 +108,32 @@ exports.runBot=async (botData)=> {
 
         try {
             orders = await driver.wait(until.elementsLocated(By.xpath(locators.urgentOrders)), parseInt(botData.refreshRate) * 1000);
-            // orders = await driver.wait(until.elementsLocated(By.xpath("//div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--read orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--premium' or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--paid orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 Ekvmc']]/div")), parseInt(botData.refreshRate) * 1000);
-
-            //div[@class='orderA-converted__order' or @class='orderA-converted__order orderA-converted__order--read orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--premium' or @class='orderA-converted__order orderA-converted__order--paid' or @class='orderA-converted__order orderA-converted__order--quick' or @class='orderA-converted__order orderA-converted__order--paid orderA-converted__order--quick' or div/div/div/div/span[@class='core__OfferRoot-sc-1xnwx2r-0 Ekvmc']]/div
             refreshs++;
-            // console.log(`ORDERS NI  ${orders.getAttribute("class")}`);
         } catch (err) {
             // console.error('err 101'+err);
             refreshs++;
-            // process.stdout.write("-");
+
+            //check for many requests
+            try {
+                await driver.wait(until.elementIsVisible(await driver.findElement(By.xpath("//center/h1[contains(text(),'429 Too Many Requests')]"))),1000)
+                console.log("TOO MANY REQUESTS ERROR,SLOWING DOWN")
+                try{
+                    await driver.wait(until.elementLocated(By.css("HAKUNA")),5000)
+                }catch(err){
+                    console.log("PLEASE WAIT")
+                }
+            } catch (err) {
+                process.stdout.write("0");
+            }
+
             await driver.navigate().refresh();
             continue;
 
         }
 
         console.log(` orders[ ${orders.length}]`);
+
+        
 
         // map(orders, e => e.findElement(By.xpath(".//a[@class='orderA-converted__name' or @class='orderA-converted__name orderA-converted__name--read']")).getText())
         //     .then(function (values) {

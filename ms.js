@@ -18,6 +18,7 @@ options.addArguments("--log-level=3");
     //read bot data
     let botData=fs.readFileSync('settings.json','utf8')
     let secondMessage=await JSON.parse(botData).secondMessage
+    let delay=await JSON.parse(botData).secondMessageDelay
 
     let alreadyMessaged=new Array()
     let driver = new Builder()
@@ -36,9 +37,9 @@ options.addArguments("--log-level=3");
     let odaID=null
     while(1>0){
         try{
-            await driver.wait(until.elementLocated(By.css("HAKUNA")),5000)
+            await driver.wait(until.elementLocated(By.css("HAKUNA")),delay*1000)
         }catch(err){
-            console.log("waited 5 secs to send second message")
+            console.log(`waited ${delay} secs to send second message`)
         }
     
         try{

@@ -50,6 +50,7 @@ function settings() {
             data.priceLevel = req.body.priceLevel
             data.refreshRate = req.body.refreshRate
             data.secondMessage=req.body.secondMessage.trim()
+            data.secondMessageDelay=parseInt(req.body.secondMessageDelay)
             if (req.body.bidUrgent === "on") {
                 data.bidUrgent = true
             } else {
