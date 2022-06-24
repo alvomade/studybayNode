@@ -15,8 +15,9 @@
     "chromedriver": "^101.0.0",
     "ejs": "^3.1.8",
     "express": "^4.17.3",
-    "nexe": "^4.0.0-rc.1",
-    "pkg": "^5.7.0",
     "selenium-webdriver": "4.1.1"
+  },
+  "devDependencies": {
+    "nexe": "^4.0.0-rc.1"
   }
 }

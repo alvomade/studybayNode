@@ -253,6 +253,8 @@ exports.runBot=async (botData)=> {
                 console.error('err 110' + err);
                 break;
             }
+
+            // break
         }
 
         await driver.navigate().refresh();

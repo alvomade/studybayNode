@@ -98,6 +98,7 @@ settings().then((currentSettings) => {
             .then((result) => {
                 if (!result.data[0].active) {
                     console.log('subscription expired');
+                    setTimeout(()=>{console.log('closing')},5000)
                     // sleep.sleep(10)
                 } else if (result.data[0].active) {
                     console.log('subscription is ACTIVE ,exp on: ', result.data[0].end);
@@ -116,6 +117,7 @@ settings().then((currentSettings) => {
                         
                     } else {
                         console.log('subscription belongs to another user/wrong email,contact admin for help')
+                        setTimeout(()=>{console.log('closing')},5000)
                     }
 
                 }
