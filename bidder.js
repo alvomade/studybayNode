@@ -10,6 +10,11 @@ var options = new chrome.Options();
 // options.addArguments("dissable-gpu")
 options.addArguments("--disable-logging");
 options.addArguments("--log-level=3");
+// options.
+
+// const pref = new Map();
+// pref.set('profile.default_content_setting_values.notifications', 2)
+
 
 
 exports.runBot=async (botData)=> {
@@ -17,6 +22,7 @@ exports.runBot=async (botData)=> {
     //getting the locators
     readWrite.getLocators().then((data)=>{
         locators=data
+        console.log(locators)
 
     }).catch(err=>console.log(err))
 
@@ -80,8 +86,10 @@ exports.runBot=async (botData)=> {
     }
 
     let orders = null;
+    let bidded=new Set()
     let refreshs = 0
-
+    let orderID=null
+    let skip_bidded_orders=true
     while (1 > 0) {
 
         //
@@ -141,7 +149,26 @@ exports.runBot=async (botData)=> {
         //     });
         //     continue;
         for (let order of orders) {
+            //get order ID
+            if (skip_bidded_orders) {
+                try {
+                    orderID=await driver.wait(until.elementIsVisible(await order.findElement(By.xpath(".//a"))), 5000).getAttribute('href')
+                    console.log(`ORDER ID ISSSSS: ${orderID}`)
+                } catch (err) {
+                    console.error('err 103-c' + err);
+                    break;
+                }
+            }
 
+            //filter out already bidded orders
+            if(skip_bidded_orders){
+                if(bidded.has(orderID)){
+                    console.log('HAS ALREADY BEEN BIDDED ON',orderID)
+                    await driver.sleep(3000)
+                    console.log('...')
+                    continue
+                }
+            }
              
             //the more button
             try {
@@ -150,6 +177,8 @@ exports.runBot=async (botData)=> {
                 console.error('err 103' + err);
                 break;
             }
+            
+            
 
             //subject filter
             if (unwantedSubjects.size > 0) {
@@ -242,6 +271,11 @@ exports.runBot=async (botData)=> {
             } catch (err) {
                 console.error('err 109' + err);
                 break;
+            }
+
+            //save already bidded orders to array
+            if(skip_bidded_orders){
+                bidded.add(orderID)
             }
 
             //close modal    
